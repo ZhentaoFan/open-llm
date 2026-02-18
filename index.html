@@ -218,22 +218,53 @@
         padding: 12px;
       }
 
-      .panel-note {
-        margin: 2px 4px 10px;
-        color: #6b7280;
-        font-size: 0.9rem;
-      }
-
       .pdf-block + .pdf-block {
         margin-top: 16px;
       }
 
       .pdf-viewer {
         width: 100%;
-        height: min(74vh, 820px);
         border: 1px solid #d8dce3;
         border-radius: 8px;
         background: #fff;
+        padding: 10px;
+        min-height: 120px;
+      }
+
+      .pdf-status {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.9rem;
+      }
+
+      .pdf-pages {
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .pdf-page {
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        overflow: hidden;
+        background: #fff;
+      }
+
+      .pdf-page canvas {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .pdf-fallback {
+        margin: 10px 0 0;
+        font-size: 0.9rem;
+      }
+
+      .pdf-fallback a {
+        color: #6b7280;
+        text-decoration: underline;
       }
 
       @media (max-width: 760px) {
@@ -245,10 +276,6 @@
           flex-direction: column;
           align-items: flex-start;
           gap: 8px;
-        }
-
-        .pdf-viewer {
-          height: 58vh;
         }
       }
     </style>
@@ -298,12 +325,10 @@
                   <span class="toggle-mark">▶</span>
                 </summary>
                 <div class="pdf-panel">
-                  <p class="panel-note" data-from-src></p>
-                  <iframe
-                    class="pdf-viewer"
-                    src="./MambaCP特性讲解.pdf"
-                    loading="lazy"
-                  ></iframe>
+                  <div class="pdf-viewer" data-pdf-src="./MambaCP特性讲解.pdf">
+                    <p class="pdf-status">展开后加载 PDF 预览...</p>
+                    <div class="pdf-pages" hidden></div>
+                  </div>
                 </div>
               </details>
             </div>
@@ -321,12 +346,10 @@
                   <span class="toggle-mark">▶</span>
                 </summary>
                 <div class="pdf-panel">
-                  <p class="panel-note" data-from-src></p>
-                  <iframe
-                    class="pdf-viewer"
-                    src="./DeepSeek-C8优化讲解.pdf"
-                    loading="lazy"
-                  ></iframe>
+                  <div class="pdf-viewer" data-pdf-src="./DeepSeek-C8优化讲解.pdf">
+                    <p class="pdf-status">展开后加载 PDF 预览...</p>
+                    <div class="pdf-pages" hidden></div>
+                  </div>
                 </div>
               </details>
               <details class="file-item">
@@ -335,12 +358,10 @@
                   <span class="toggle-mark">▶</span>
                 </summary>
                 <div class="pdf-panel">
-                  <p class="panel-note" data-from-src></p>
-                  <iframe
-                    class="pdf-viewer"
-                    src="./MLA-PageAtten-MTP优化讲解.pdf"
-                    loading="lazy"
-                  ></iframe>
+                  <div class="pdf-viewer" data-pdf-src="./MLA-PageAtten-MTP优化讲解.pdf">
+                    <p class="pdf-status">展开后加载 PDF 预览...</p>
+                    <div class="pdf-pages" hidden></div>
+                  </div>
                 </div>
               </details>
             </div>
@@ -358,12 +379,10 @@
                   <span class="toggle-mark">▶</span>
                 </summary>
                 <div class="pdf-panel">
-                  <p class="panel-note" data-from-src></p>
-                  <iframe
-                    class="pdf-viewer"
-                    src="./ZeCO-HDP优化讲解.pdf"
-                    loading="lazy"
-                  ></iframe>
+                  <div class="pdf-viewer" data-pdf-src="./ZeCO-HDP优化讲解.pdf">
+                    <p class="pdf-status">展开后加载 PDF 预览...</p>
+                    <div class="pdf-pages" hidden></div>
+                  </div>
                 </div>
               </details>
             </div>
@@ -377,17 +396,123 @@
       const getFileNameFromSrc = (src) => {
         const path = (src || "").split("#")[0].split("?")[0];
         const tail = path.substring(path.lastIndexOf("/") + 1);
-        return decodeURIComponent(tail);
+        try {
+          return decodeURIComponent(tail);
+        } catch {
+          return tail;
+        }
+      };
+
+      const getPdfSrc = (viewer) => viewer.getAttribute("data-pdf-src") || "";
+
+      let pdfJsLoader;
+      const loadPdfJs = () => {
+        if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+        if (!pdfJsLoader) {
+          pdfJsLoader = new Promise((resolve, reject) => {
+            const script = document.createElement("script");
+            script.src = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js";
+            script.onload = () => {
+              if (!window.pdfjsLib) {
+                reject(new Error("PDF.js is unavailable"));
+                return;
+              }
+              window.pdfjsLib.GlobalWorkerOptions.workerSrc =
+                "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+              resolve(window.pdfjsLib);
+            };
+            script.onerror = () => reject(new Error("Failed to load PDF.js"));
+            document.head.appendChild(script);
+          });
+        }
+        return pdfJsLoader;
+      };
+
+      const createFallbackLink = (viewer, src, fileName) => {
+        if (viewer.querySelector(".pdf-fallback")) return;
+        const row = document.createElement("p");
+        row.className = "pdf-fallback";
+        const link = document.createElement("a");
+        link.href = src;
+        link.target = "_blank";
+        link.rel = "noopener";
+        link.textContent = `打开 ${fileName}`;
+        row.appendChild(link);
+        viewer.appendChild(row);
+      };
+
+      const renderPdf = async (viewer) => {
+        if (viewer.dataset.renderState === "loading" || viewer.dataset.renderState === "done") return;
+        const src = getPdfSrc(viewer);
+        if (!src) return;
+
+        const status = viewer.querySelector(".pdf-status");
+        const pagesRoot = viewer.querySelector(".pdf-pages");
+        const setStatus = (text) => {
+          if (!status) return;
+          status.textContent = text;
+          status.hidden = false;
+        };
+
+        viewer.dataset.renderState = "loading";
+        setStatus("PDF 加载中...");
+
+        try {
+          const pdfjsLib = await loadPdfJs();
+          const task = pdfjsLib.getDocument(src);
+          const pdf = await task.promise;
+          const deviceScale = Math.min(window.devicePixelRatio || 1, 2);
+          const targetCssWidth = Math.max(viewer.clientWidth - 22, 280);
+          pagesRoot.innerHTML = "";
+
+          for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
+            const page = await pdf.getPage(pageNum);
+            const viewport1x = page.getViewport({ scale: 1 });
+            const cssScale = targetCssWidth / viewport1x.width;
+            const renderViewport = page.getViewport({ scale: cssScale * deviceScale });
+
+            const canvas = document.createElement("canvas");
+            const context = canvas.getContext("2d", { alpha: false });
+            canvas.width = Math.ceil(renderViewport.width);
+            canvas.height = Math.ceil(renderViewport.height);
+            canvas.style.width = `${Math.ceil(renderViewport.width / deviceScale)}px`;
+            canvas.style.height = `${Math.ceil(renderViewport.height / deviceScale)}px`;
+
+            const pageShell = document.createElement("div");
+            pageShell.className = "pdf-page";
+            pageShell.appendChild(canvas);
+            pagesRoot.appendChild(pageShell);
+
+            await page.render({ canvasContext: context, viewport: renderViewport }).promise;
+          }
+
+          pagesRoot.hidden = false;
+          if (status) status.hidden = true;
+          viewer.dataset.renderState = "done";
+        } catch (error) {
+          console.error(error);
+          viewer.dataset.renderState = "error";
+          const fileName = getFileNameFromSrc(src);
+          setStatus("移动端预览失败，请点击下方链接打开 PDF。");
+          createFallbackLink(viewer, src, fileName);
+        }
       };
 
       document.querySelectorAll("details.file-item").forEach((item) => {
-        const viewer = item.querySelector(".pdf-viewer");
+        const viewer = item.querySelector(".pdf-viewer[data-pdf-src]");
         if (!viewer) return;
-        const fileName = getFileNameFromSrc(viewer.getAttribute("src"));
+
+        const fileName = getFileNameFromSrc(getPdfSrc(viewer));
         item.querySelectorAll("[data-from-src]").forEach((node) => {
           node.textContent = fileName;
         });
-        viewer.title = fileName.replace(/\.pdf$/i, "") + " PDF";
+
+        item.addEventListener("toggle", () => {
+          if (!item.open) return;
+          renderPdf(viewer);
+        });
+
+        if (item.open) renderPdf(viewer);
       });
     </script>
   </body>
