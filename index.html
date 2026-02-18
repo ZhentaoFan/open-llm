@@ -210,20 +210,9 @@
         transform: rotate(90deg);
       }
 
-      .pdf-panel {
-        background: var(--panel);
-        border: 1px solid var(--line);
-        border-radius: 10px;
-        margin: 0 12px 12px;
-        padding: 12px;
-      }
-
-      .pdf-block + .pdf-block {
-        margin-top: 16px;
-      }
-
       .pdf-viewer {
         width: 100%;
+        margin: 0 12px 12px;
         border: 1px solid #d8dce3;
         border-radius: 8px;
         background: #fff;
@@ -237,14 +226,8 @@
         font-size: 0.9rem;
       }
 
-      .pdf-pages {
-        margin-top: 10px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-      }
-
       .pdf-page {
+        margin-top: 10px;
         border: 1px solid #e5e7eb;
         border-radius: 6px;
         overflow: hidden;
@@ -286,7 +269,7 @@
         <div class="identity">
           <div class="brand">Zhentao Fan</div>
           <div class="identity-contact" id="contact">
-            多伦多大学本硕，本科生讲师
+            多伦多大学本硕，两年修满学分，本科生讲师
           </div>
           <div class="identity-contact" id="contact">
             Contact:
@@ -302,10 +285,10 @@
 
       <section class="hero" id="about">
         <h2>Open-Sourced Innovation</h2>
-        <p>
+        <!-- <p>
           研究方向：
           训练并行框架，算子优化，长程多轮RL
-        </p>
+        </p> -->
       </section>
 
       <section id="works">
@@ -316,7 +299,7 @@
           <article class="work-entry">
             <div class="work-title-wrap">
               <div class="work-title">【创新｜独作】Mamba Context Parallel <span class="work-date">[2025/05｜华为加研院TechSpark年度创新银奖]</span></div>
-              <div class="work-desc">Mamba2 上下文并行算法： 加速10%～20%，无限上下文训练，可与现有TPSP方法叠加。<a href="https://gitcode.com/Ascend/MindSpeed-LLM/blob/2.3.0/mindspeed_llm/tasks/models/ssm/state_space_context_parallel.py" target="_blank" rel="noopener">[代码]</a></div>
+              <div class="work-desc">Mamba2 上下文并行算法： 预训练加速10%～20%，无限上下文训练，可与现有TPSP方法叠加。<a href="https://gitcode.com/Ascend/MindSpeed-LLM/blob/2.3.0/mindspeed_llm/tasks/models/ssm/state_space_context_parallel.py" target="_blank" rel="noopener">[代码]</a></div>
             </div>
             <div class="file-list">
               <details class="file-item">
@@ -324,11 +307,8 @@
                   <span class="file-name" data-from-src></span>
                   <span class="toggle-mark">▶</span>
                 </summary>
-                <div class="pdf-panel">
-                  <div class="pdf-viewer" data-pdf-src="./MambaCP特性讲解.pdf">
-                    <p class="pdf-status">展开后加载 PDF 预览...</p>
-                    <div class="pdf-pages" hidden></div>
-                  </div>
+                <div class="pdf-viewer" data-pdf-src="./MambaCP特性讲解.pdf">
+                  <p class="pdf-status">展开后加载 PDF 预览...</p>
                 </div>
               </details>
             </div>
@@ -345,11 +325,8 @@
                   <span class="file-name" data-from-src></span>
                   <span class="toggle-mark">▶</span>
                 </summary>
-                <div class="pdf-panel">
-                  <div class="pdf-viewer" data-pdf-src="./DeepSeek-C8优化讲解.pdf">
-                    <p class="pdf-status">展开后加载 PDF 预览...</p>
-                    <div class="pdf-pages" hidden></div>
-                  </div>
+                <div class="pdf-viewer" data-pdf-src="./DeepSeek-C8优化讲解.pdf">
+                  <p class="pdf-status">展开后加载 PDF 预览...</p>
                 </div>
               </details>
               <details class="file-item">
@@ -357,11 +334,8 @@
                   <span class="file-name" data-from-src></span>
                   <span class="toggle-mark">▶</span>
                 </summary>
-                <div class="pdf-panel">
-                  <div class="pdf-viewer" data-pdf-src="./MLA-PageAtten-MTP优化讲解.pdf">
-                    <p class="pdf-status">展开后加载 PDF 预览...</p>
-                    <div class="pdf-pages" hidden></div>
-                  </div>
+                <div class="pdf-viewer" data-pdf-src="./MLA-PageAtten-MTP优化讲解.pdf">
+                  <p class="pdf-status">展开后加载 PDF 预览...</p>
                 </div>
               </details>
             </div>
@@ -378,11 +352,8 @@
                   <span class="file-name" data-from-src></span>
                   <span class="toggle-mark">▶</span>
                 </summary>
-                <div class="pdf-panel">
-                  <div class="pdf-viewer" data-pdf-src="./ZeCO-HDP优化讲解.pdf">
-                    <p class="pdf-status">展开后加载 PDF 预览...</p>
-                    <div class="pdf-pages" hidden></div>
-                  </div>
+                <div class="pdf-viewer" data-pdf-src="./ZeCO-HDP优化讲解.pdf">
+                  <p class="pdf-status">展开后加载 PDF 预览...</p>
                 </div>
               </details>
             </div>
@@ -447,7 +418,6 @@
         if (!src) return;
 
         const status = viewer.querySelector(".pdf-status");
-        const pagesRoot = viewer.querySelector(".pdf-pages");
         const setStatus = (text) => {
           if (!status) return;
           status.textContent = text;
@@ -463,7 +433,8 @@
           const pdf = await task.promise;
           const deviceScale = Math.min(window.devicePixelRatio || 1, 2);
           const targetCssWidth = Math.max(viewer.clientWidth - 22, 280);
-          pagesRoot.innerHTML = "";
+          viewer.querySelectorAll(".pdf-page").forEach((node) => node.remove());
+          viewer.querySelectorAll(".pdf-fallback").forEach((node) => node.remove());
 
           for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
             const page = await pdf.getPage(pageNum);
@@ -481,12 +452,11 @@
             const pageShell = document.createElement("div");
             pageShell.className = "pdf-page";
             pageShell.appendChild(canvas);
-            pagesRoot.appendChild(pageShell);
+            viewer.appendChild(pageShell);
 
             await page.render({ canvasContext: context, viewport: renderViewport }).promise;
           }
 
-          pagesRoot.hidden = false;
           if (status) status.hidden = true;
           viewer.dataset.renderState = "done";
         } catch (error) {
