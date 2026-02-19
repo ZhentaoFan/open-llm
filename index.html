@@ -115,6 +115,22 @@
         font-weight: 600;
       }
 
+      .pending-fold {
+        border-top: 1px solid var(--line);
+      }
+
+      .pending-summary {
+        align-items: center;
+      }
+
+      .pending-summary .section-title {
+        margin: 0;
+      }
+
+      .pending-summary .toggle-mark {
+        margin-right: 12px;
+      }
+
       .works-intro {
         margin: 0 0 8px;
         color: var(--muted);
@@ -166,7 +182,7 @@
 
       .work-desc a {
         color: #6b7280;
-        text-decoration: none;
+        text-decoration: underline;
       }
 
       .work-desc a:hover {
@@ -240,6 +256,16 @@
         height: auto;
       }
 
+      .asset-image {
+        display: block;
+        width: 100%;
+        height: auto;
+        margin-top: 10px;
+        border: 1px solid #e5e7eb;
+        border-radius: 6px;
+        background: #fff;
+      }
+
       .pdf-fallback {
         margin: 10px 0 0;
         font-size: 0.9rem;
@@ -248,6 +274,39 @@
       .pdf-fallback a {
         color: #6b7280;
         text-decoration: underline;
+      }
+
+      .back-to-top {
+        position: fixed;
+        right: 128px;
+        bottom: 22px;
+        width: 46px;
+        height: 46px;
+        border: 1px solid #d1d5db;
+        border-radius: 999px;
+        background: #ffffff;
+        color: #6b7280;
+        font-size: 1.15rem;
+        line-height: 1;
+        display: grid;
+        place-items: center;
+        box-shadow: 0 8px 20px rgba(17, 24, 39, 0.12);
+        cursor: pointer;
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+        transition: color 0.2s ease;
+        z-index: 20;
+      }
+
+      .back-to-top svg {
+        width: 20px;
+        height: 20px;
+        display: block;
+      }
+
+      .back-to-top:hover {
+        color: #374151;
       }
 
       @media (max-width: 760px) {
@@ -259,6 +318,11 @@
           flex-direction: column;
           align-items: flex-start;
           gap: 8px;
+        }
+
+        .back-to-top {
+          right: 24px;
+          bottom: 14px;
         }
       }
     </style>
@@ -292,7 +356,7 @@
       </section>
 
       <section id="works">
-        <h2 class="section-title">落地项目</h2>
+        <h2 class="section-title">已落地工作</h2>
         <!-- <p class="works-intro">占位符。</p> -->
 
         <div class="works">
@@ -361,7 +425,83 @@
 
         </div>
       </section>
+
+      <section id="pending-works">
+        <details class="pending-fold">
+          <summary class="pending-summary">
+            <h2 class="section-title">未落地工作</h2>
+            <span class="toggle-mark">▶</span>
+          </summary>
+          <div class="works">
+            <article class="work-entry">
+              <div class="work-title-wrap">
+                <div class="work-title">【创新｜独作】StereoDiT <span class="work-date">[2025/09]</span></div>
+                <div class="work-desc">任意视频推理出3D双目视频：效果不错，稳定性低，难产品化。</div>
+              </div>
+              <div class="file-list">
+                <details class="file-item">
+                  <summary>
+                    <span class="file-name" data-from-src></span>
+                    <span class="toggle-mark">▶</span>
+                  </summary>
+                  <div class="pdf-viewer" data-pdf-src="./StereoDiT.pdf">
+                    <p class="pdf-status">展开后加载 PDF 预览...</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <article class="work-entry">
+              <div class="work-title-wrap">
+                <div class="work-title">【创新｜合著】TaoCache <span class="work-date">[2025/08]</span></div>
+                <div class="work-desc">视频生成推理加速：物体结构保持性好，加速上限低。</div>
+              </div>
+              <div class="file-list">
+                <details class="file-item">
+                  <summary>
+                    <span class="file-name" data-from-src></span>
+                    <span class="toggle-mark">▶</span>
+                  </summary>
+                  <div class="pdf-viewer" data-pdf-src="./TaoCache.pdf">
+                    <p class="pdf-status">展开后加载 PDF 预览...</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+
+            <article class="work-entry">
+              <div class="work-title-wrap">
+                <div class="work-title">【创新｜独作】SwapDual <span class="work-date">[2025/02]</span></div>
+                <div class="work-desc">VPP反向阶段前置Stage1的权重更新并Swap至互补rank的卡上，提前下一轮前向减少空泡：对现有产品框架入侵大。</div>
+              </div>
+              <div class="file-list">
+                <details class="file-item">
+                  <summary>
+                    <span class="file-name" data-from-src></span>
+                    <span class="toggle-mark">▶</span>
+                  </summary>
+                  <div class="pdf-viewer" data-pdf-src="./SwapDual.png">
+                    <p class="pdf-status">展开后加载 PDF 预览...</p>
+                  </div>
+                </details>
+              </div>
+            </article>
+          </div>
+        </details>
+      </section>
     </main>
+    <button class="back-to-top" id="backToTop" type="button" aria-label="回到顶部" title="回到顶部">
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          d="M12 18V6M12 6L7 11M12 6L17 11"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    </button>
 
     <script>
       const getFileNameFromSrc = (src) => {
@@ -375,6 +515,12 @@
       };
 
       const getPdfSrc = (viewer) => viewer.getAttribute("data-pdf-src") || "";
+      const getFileExt = (src) => {
+        const path = (src || "").split("#")[0].split("?")[0];
+        const dot = path.lastIndexOf(".");
+        return dot === -1 ? "" : path.slice(dot + 1).toLowerCase();
+      };
+      const isImageExt = (ext) => ["png", "jpg", "jpeg", "webp", "gif", "bmp", "svg"].includes(ext);
 
       let pdfJsLoader;
       const loadPdfJs = () => {
@@ -412,10 +558,18 @@
         viewer.appendChild(row);
       };
 
-      const renderPdf = async (viewer) => {
+      const clearViewer = (viewer) => {
+        viewer.querySelectorAll(".pdf-page").forEach((node) => node.remove());
+        viewer.querySelectorAll(".asset-image").forEach((node) => node.remove());
+        viewer.querySelectorAll(".pdf-fallback").forEach((node) => node.remove());
+      };
+
+      const renderPreview = async (viewer) => {
         if (viewer.dataset.renderState === "loading" || viewer.dataset.renderState === "done") return;
         const src = getPdfSrc(viewer);
         if (!src) return;
+        const ext = getFileExt(src);
+        const fileName = getFileNameFromSrc(src);
 
         const status = viewer.querySelector(".pdf-status");
         const setStatus = (text) => {
@@ -425,6 +579,50 @@
         };
 
         viewer.dataset.renderState = "loading";
+        clearViewer(viewer);
+
+        if (isImageExt(ext)) {
+          setStatus("图片加载中...");
+          const img = new Image();
+          img.className = "asset-image";
+          img.loading = "lazy";
+          img.decoding = "async";
+          img.alt = fileName;
+          let finished = false;
+          const imageTimeout = window.setTimeout(() => {
+            if (finished) return;
+            viewer.dataset.renderState = "error";
+            setStatus("图片加载超时，请点击下方链接打开文件。");
+            createFallbackLink(viewer, src, fileName);
+          }, 8000);
+
+          img.onload = () => {
+            finished = true;
+            window.clearTimeout(imageTimeout);
+            if (status) status.hidden = true;
+            viewer.dataset.renderState = "done";
+          };
+
+          img.onerror = () => {
+            finished = true;
+            window.clearTimeout(imageTimeout);
+            viewer.dataset.renderState = "error";
+            setStatus("图片预览失败，请点击下方链接打开文件。");
+            createFallbackLink(viewer, src, fileName);
+          };
+
+          viewer.appendChild(img);
+          img.src = src;
+          return;
+        }
+
+        if (ext !== "pdf") {
+          viewer.dataset.renderState = "error";
+          setStatus("该文件类型暂不支持内嵌预览，请点击下方链接打开。");
+          createFallbackLink(viewer, src, fileName);
+          return;
+        }
+
         setStatus("PDF 加载中...");
 
         try {
@@ -433,8 +631,6 @@
           const pdf = await task.promise;
           const deviceScale = Math.min(window.devicePixelRatio || 1, 2);
           const targetCssWidth = Math.max(viewer.clientWidth - 22, 280);
-          viewer.querySelectorAll(".pdf-page").forEach((node) => node.remove());
-          viewer.querySelectorAll(".pdf-fallback").forEach((node) => node.remove());
 
           for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
             const page = await pdf.getPage(pageNum);
@@ -462,7 +658,6 @@
         } catch (error) {
           console.error(error);
           viewer.dataset.renderState = "error";
-          const fileName = getFileNameFromSrc(src);
           setStatus("移动端预览失败，请点击下方链接打开 PDF。");
           createFallbackLink(viewer, src, fileName);
         }
@@ -472,18 +667,31 @@
         const viewer = item.querySelector(".pdf-viewer[data-pdf-src]");
         if (!viewer) return;
 
-        const fileName = getFileNameFromSrc(getPdfSrc(viewer));
+        const src = getPdfSrc(viewer);
+        const fileName = getFileNameFromSrc(src);
+        const ext = getFileExt(src);
         item.querySelectorAll("[data-from-src]").forEach((node) => {
           node.textContent = fileName;
         });
+        const status = viewer.querySelector(".pdf-status");
+        if (status) {
+          status.textContent = isImageExt(ext) ? "展开后加载图片预览..." : "展开后加载 PDF 预览...";
+        }
 
         item.addEventListener("toggle", () => {
           if (!item.open) return;
-          renderPdf(viewer);
+          renderPreview(viewer);
         });
 
-        if (item.open) renderPdf(viewer);
+        if (item.open) renderPreview(viewer);
       });
+
+      const backToTopBtn = document.getElementById("backToTop");
+      if (backToTopBtn) {
+        backToTopBtn.addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+      }
     </script>
   </body>
 </html>
