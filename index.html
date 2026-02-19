@@ -216,10 +216,24 @@
 
       .toggle-mark {
         flex: 0 0 auto;
-        color: var(--link);
-        font-size: 1.1rem;
-        font-weight: 600;
+        color: #9ca3af;
+        font-size: 0;
+        line-height: 0;
+        width: 14px;
+        height: 14px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
         transition: transform 0.2s ease;
+      }
+
+      .toggle-mark::before {
+        content: "";
+        width: 0;
+        height: 0;
+        border-top: 5px solid transparent;
+        border-bottom: 5px solid transparent;
+        border-left: 8px solid currentColor;
       }
 
       details[open] .toggle-mark {
@@ -227,13 +241,14 @@
       }
 
       .pdf-viewer {
-        width: 100%;
+        width: auto;
         margin: 0 12px 12px;
         border: 1px solid #d8dce3;
         border-radius: 8px;
         background: #fff;
         padding: 10px;
         min-height: 120px;
+        overflow: hidden;
       }
 
       .pdf-status {
@@ -248,6 +263,7 @@
         border-radius: 6px;
         overflow: hidden;
         background: #fff;
+        max-width: 100%;
       }
 
       .pdf-page canvas {
@@ -259,6 +275,7 @@
       .asset-image {
         display: block;
         width: 100%;
+        max-width: 100%;
         height: auto;
         margin-top: 10px;
         border: 1px solid #e5e7eb;
@@ -630,7 +647,7 @@
           const task = pdfjsLib.getDocument(src);
           const pdf = await task.promise;
           const deviceScale = Math.min(window.devicePixelRatio || 1, 2);
-          const targetCssWidth = Math.max(viewer.clientWidth - 22, 280);
+          const targetCssWidth = Math.max(viewer.clientWidth - 20, 160);
 
           for (let pageNum = 1; pageNum <= pdf.numPages; pageNum += 1) {
             const page = await pdf.getPage(pageNum);
@@ -642,8 +659,8 @@
             const context = canvas.getContext("2d", { alpha: false });
             canvas.width = Math.ceil(renderViewport.width);
             canvas.height = Math.ceil(renderViewport.height);
-            canvas.style.width = `${Math.ceil(renderViewport.width / deviceScale)}px`;
-            canvas.style.height = `${Math.ceil(renderViewport.height / deviceScale)}px`;
+            canvas.style.width = "100%";
+            canvas.style.height = "auto";
 
             const pageShell = document.createElement("div");
             pageShell.className = "pdf-page";
